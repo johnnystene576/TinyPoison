@@ -1,0 +1,6 @@
+{
+	"output_file_name": "output.pcap",
+	"wireless_interface": "wlan0",
+	"victim_ip": "192.168.0.11",
+	"router_ip": "192.168.0.1"
+}
