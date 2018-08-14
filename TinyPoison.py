@@ -43,10 +43,21 @@ def spoof_arp():
 
 if __name__ == "__main__":
 	print("TinyPoison 1.0")
-	with open("config.json") as configfile:
-		config = json.load(configfile)
-	output_file_name = config["output_file_name"]
-	interface = config["wireless_interface"]
-	victim_ip_address = config["victim_ip"]
-	router_ip_address = config["router_ip"]
+	try:
+		with open("config.json") as configfile:
+			config = json.load(configfile)
+		output_file_name = config["output_file_name"]
+		interface = config["wireless_interface"]
+		victim_ip_address = config["victim_ip"]
+		router_ip_address = config["router_ip"]
+	except:
+		print("Failed to load config.json")
+		print("What file do you want to output to?")
+		output_file_name = raw_input(">")
+		print("What wireless interface do you want to use?")
+		interface = raw_input(">")
+		print("What is the victim's IP address?")
+		victim_ip_address = raw_input(">")
+		print("What is your router's IP address?")
+		router_ip_address = raw_input(">")
 	spoof_arp()
