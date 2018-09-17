@@ -6,13 +6,6 @@
 	
 	This application is intended for EDUCATIONAL USE ONLY.
 	I am in no way responsible for your use of this program.
-	
-	config.json:
-		output_file_name: The filename you want to output to
-		auto_detect_interface: Have TinyPoison auto-detect your default wireless interface and gateway IP
-			wireless_interface: If auto_detect_interface is not true, TinyPoison will fall back to this interface.
-			router_ip: If auto_detect_interface is not true, TinyPoison will assume this is the gateway IP
-		victim_ip: If this is not set to ask, it is the IP attacked by TinyPoison
 '''
 
 try:
@@ -117,6 +110,7 @@ if __name__ == "__main__":
 	
 	# Create window contents
 	root = Tk()
+	root.title("TinyPoison")
 	Label(root, text="Network interface:").pack()
 	interface_input = Entry(root)
 	interface_input.pack()
